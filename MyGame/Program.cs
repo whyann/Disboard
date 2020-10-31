@@ -1,16 +1,15 @@
 ﻿using Disboard;
+using Gapos;
 
-namespace MyGame
+class Program
 {
-    class Program
+    [System.STAThread()]
+    static void Main()
     {
-        static void Main()
-        {
-            var disboard = new Disboard<MyGameFactory>();
-            disboard.Run("Token.token");
-        }
+        var disboard = new Disboard<GaposFactory>();
+        disboard.Run(Token.token);
     }
-
+}
 }
 
 /* 1. 위 코드의 disboard.Run("Token.token");의 두 큰 따옴표를 제거합니다.
