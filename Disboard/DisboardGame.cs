@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DSharpPlus.Entities;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ namespace Disboard
             InitialPlayers = initData.Players;
             MessageQueue = initData.MessageQueue;
             Render = Channel.Render;
-            OnFinish = () => {
+            OnFinish = () =>
+            {
                 IsFinished = true;
                 initData.OnFinish(initData.Channel.Id);
             };
@@ -29,7 +31,7 @@ namespace Disboard
 
         internal bool IsDebug { get; }
         internal bool IsFinished { get; private set; } = false;
-        internal ConcurrentQueue<Task> MessageQueue { get; }
+        internal ConcurrentQueue<Func<Task>> MessageQueue { get; }
         internal Semaphore Semaphore { get; } = new Semaphore();
 
         /// <summary>
@@ -62,7 +64,6 @@ namespace Disboard
         public IReadOnlyList<DisboardPlayer> InitialPlayers { get; }
         /// <summary>
         /// WPF 컨트롤을 사용하여 이미지를 그릴 수 있습니다. EchoVisual.cs를 예제로써 참고하세요.
-        /// 사용하려면 Main 함수 윗줄에 [System.STAThread()]를 추가해야 합니다.
         /// </summary>
         public RenderType Render { get; }
         /// <summary>

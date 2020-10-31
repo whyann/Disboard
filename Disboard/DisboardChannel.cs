@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +30,6 @@ namespace Disboard
         public string URL { get; }
         /// <summary>
         /// WPF 컨트롤을 사용하여 이미지를 그릴 수 있습니다. EchoVisual.cs를 예제로써 참고하세요.
-        /// 사용하려면 Main 함수 윗줄에 [System.STAThread()]를 추가해야 합니다.
         /// </summary>
         public RenderType Render { get; }
 
@@ -39,11 +39,11 @@ namespace Disboard
         /// <param name="channel">그룹 채널일 수도, DM 채널일 수도 있습니다.</param>
         /// <param name="messageQueue">메시지 큐에 태스크를 넣으면 메시지를 전송할 수 있습니다.</param>
         /// <param name="dispatcher">WPF 컨트롤을 다루기 위해 메인 스레드의 디스패쳐가 필요합니다.</param>
-        internal protected DisboardChannel(DiscordChannel channel, ConcurrentQueue<Task> messageQueue, Dispatcher dispatcher)
+        internal protected DisboardChannel(DiscordChannel channel, ConcurrentQueue<Func<Task>> messageQueue, Dispatcher dispatcher)
         {
-            Send = (message, embed) => messageQueue.Enqueue(channel.SendMessageAsync(message, embed: embed));
-            SendImage = (stream, message, embed) => messageQueue.Enqueue(channel.SendFileAsync(stream, file_name: "image.png", content: message, embed: embed));
-            SendImages = (streams, message, embed) => messageQueue.Enqueue(channel.SendMultipleFilesAsync(streams.Enumerate().ToDictionary(_ => $"{_.index}.png", _ => _.elem), content: message, embed: embed));
+            Send = (message, embed) => messageQueue.Enqueue(() => channel.SendMessageAsync(message, embed: embed));
+            SendImage = (stream, message, embed) => messageQueue.Enqueue(() => channel.SendFileAsync(stream, file_name: "image.png", content: message, embed: embed));
+            SendImages = (streams, message, embed) => messageQueue.Enqueue(() => channel.SendMultipleFilesAsync(streams.Enumerate().ToDictionary(_ => $"{_.index}.png", _ => _.elem), content: message, embed: embed));
 
             string guildId = channel.GuildId == default ? "@me" : $"{channel.GuildId}";
             URL = $"https://discord.com/channels/{guildId}/{channel.Id}";

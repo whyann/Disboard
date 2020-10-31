@@ -10,20 +10,19 @@ namespace Xanth
 {
     class BoardContext
     {
-        public IReadOnlyDictionary<Disboard.DisboardPlayer, Player> PlayerDict { get; }
         public IReadOnlyList<Player> Players { get; }
         public IReadOnlyList<int> BannedOnRows { get; }
         public IReadOnlyList<int> BannedOnColumns { get; }
         public Board Board { get; }
         public int BoardSize { get; }
 
-        public static BoardContext New(IReadOnlyList<Disboard.DisboardPlayer> players)
+        public static BoardContext New(IReadOnlyList<DisboardPlayer> players)
             => new BoardContext(players);
 
-        BoardContext(IReadOnlyList<Disboard.DisboardPlayer> players)
+        BoardContext(IReadOnlyList<DisboardPlayer> disboardPlayers)
         {
             IList<Marker> markers;
-            if (players.Count == 2)
+            if (disboardPlayers.Count == 2)
             {
                 BoardSize = 4;
                 markers = new[] { new Marker(3, 0, BoardSize), new Marker(0, 3, BoardSize) };
@@ -34,8 +33,13 @@ namespace Xanth
                 markers = new[] { new Marker(4, 1, BoardSize), new Marker(3, 4, BoardSize), new Marker(0, 3, BoardSize), new Marker(0, 1, BoardSize) };
             }
 
-            PlayerDict = players.Enumerate().ToDictionary(_ => _.elem, _ => new Player(players, _.elem, markers[_.index]));
-            Players = players.Select(_ => PlayerDict[_]).ToList();
+            Players = disboardPlayers.Select((player, index) => new Player(disboardPlayers, player, markers[index])).ToList();
+
+            foreach (var (index, player) in Players.Enumerate())
+            {
+                int nextPlayerIndex = (index == Players.Count - 1) ? 0 : index + 1;
+                player.NextPlayer = Players[nextPlayerIndex];
+            }
 
             Random random = new Random();
             int rollDice() => random.Next(1, 7);
@@ -106,7 +110,7 @@ namespace Xanth
             currentPlayer.RemainFirstMoveBonus = false;
         }
 
-        public Disgrid.Disgrid GetBoardGrid((int playerIndex, Dictionary<Slot, Slot.Permission> reachables)? CurrentState)
+        public Disgrid.Disgrid GetBoardGrid((Player player, Dictionary<Slot, Slot.Permission> reachables)? CurrentState)
         {
             int rowCount = 1 + BoardSize;
             int columnCount = 1 + BoardSize;
@@ -159,7 +163,7 @@ namespace Xanth
                         if (reachability == Slot.Permission.Reachable)
                             border.BorderBrush = transparentWhite;
                         if (reachability == Slot.Permission.Overwritable)
-                            border.BorderBrush = Players[CurrentState.Value.playerIndex].Color.Brush();
+                            border.BorderBrush = CurrentState.Value.player.Color.Brush();
 
                     }
                 }
@@ -217,13 +221,12 @@ namespace Xanth
             overwritables.ToList().ForEach(_ => result[Board.Slots[_.Item1][_.Item2]] = Slot.Permission.Overwritable);
             return result;
         }
-        public bool IsStuck(int playerIndex, int[] dices)
+        public bool IsStuck(Player player, int[] dices)
         {
-            var player = Players[playerIndex];
             var reachables = GetReachables(player, dices, 1);
             return reachables.Count == 0;
         }
-        public void Drop(int playerIndex)
-            => Players[playerIndex].IsDropped = true;
+        public void Drop(Player player)
+            => player.IsDropped = true;
     }
 }

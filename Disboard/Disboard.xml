@@ -40,6 +40,11 @@
             </summary>
             <typeparam name="GameFactoryType">파라미터가 없는 public 생성자가 있어야 합니다. 기본적인 기능만을 갖고있는 DisboardGameFactory를 사용할 수 있습니다.</typeparam>
         </member>
+        <member name="M:Disboard.Disboard`1.#ctor">
+            <summary>
+            Disboard를 생성합니다.
+            </summary>
+        </member>
         <member name="M:Disboard.Disboard`1.Run(System.String)">
             <summary>
             Disboard를 실행합니다. 실행을 블락하므로 프로그램의 마지막줄에 있어야 합니다.
@@ -74,10 +79,9 @@
         <member name="P:Disboard.DisboardChannel.Render">
             <summary>
             WPF 컨트롤을 사용하여 이미지를 그릴 수 있습니다. EchoVisual.cs를 예제로써 참고하세요.
-            사용하려면 Main 함수 윗줄에 [System.STAThread()]를 추가해야 합니다.
             </summary>
         </member>
-        <member name="M:Disboard.DisboardChannel.#ctor(DSharpPlus.Entities.DiscordChannel,System.Collections.Concurrent.ConcurrentQueue{System.Threading.Tasks.Task},System.Windows.Threading.Dispatcher)">
+        <member name="M:Disboard.DisboardChannel.#ctor(DSharpPlus.Entities.DiscordChannel,System.Collections.Concurrent.ConcurrentQueue{System.Func{System.Threading.Tasks.Task}},System.Windows.Threading.Dispatcher)">
             <summary>
             디스코드 채널입니다. 그룹 채널일 수도, DM 채널일 수도 있습니다.
             </summary>
@@ -134,7 +138,6 @@
         <member name="P:Disboard.DisboardGame.Render">
             <summary>
             WPF 컨트롤을 사용하여 이미지를 그릴 수 있습니다. EchoVisual.cs를 예제로써 참고하세요.
-            사용하려면 Main 함수 윗줄에 [System.STAThread()]를 추가해야 합니다.
             </summary>
         </member>
         <member name="M:Disboard.DisboardGame.OnGroup(Disboard.DisboardPlayer,System.String)">
@@ -182,6 +185,11 @@
         <member name="T:Disboard.DisboardPlayer">
             <summary>
             게임에 참여하는 플레이어입니다. 게임에 참가하는 인원은 변경할 수 없습니다.
+            </summary>
+        </member>
+        <member name="P:Disboard.DisboardPlayer.NextPlayer">
+            <summary>
+            다음 차례의 플레이어입니다. 순서는 InitialPlayers의 순서와 일치하며, 게임 시작시 임의로 정해집니다.
             </summary>
         </member>
         <member name="P:Disboard.DisboardPlayer.Name">

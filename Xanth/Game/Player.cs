@@ -5,14 +5,27 @@ namespace Xanth
 {
     class Player
     {
-        public Disboard.DisboardPlayer Disboard { get; }
+        public DisboardPlayer Disboard { get; }
+        public Player NextPlayer
+        {
+            get
+            {
+                while (_nextPlayer.IsDropped && _nextPlayer != this)
+                    _nextPlayer = _nextPlayer._nextPlayer;
+
+                return _nextPlayer;
+            }
+            set => _nextPlayer = value;
+        }
+        Player _nextPlayer;
         public Marker Marker { get; set; }
         public bool RemainFirstMoveBonus { get; set; }
         public bool IsDropped { get; set; } = false;
         public string Color { get; set; }
         public string DarkColor { get; set; }
-        public Player(IReadOnlyList<Disboard.DisboardPlayer> players, Disboard.DisboardPlayer player, Marker marker)
+        public Player(IReadOnlyList<DisboardPlayer> players, DisboardPlayer player, Marker marker)
         {
+            _nextPlayer = this;
             Marker = marker;
             Disboard = player;
 
